@@ -27,6 +27,12 @@ class CartScreen extends ConsumerWidget {
                 return ListTile(
                   title: Text(item["start_time"]),
                   subtitle: Text(item["date"]),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      ref.read(cartProvider.notifier).removeItem(index);
+                    },
+                  ),
                 );
               },
             ),
