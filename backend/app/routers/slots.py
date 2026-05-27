@@ -33,7 +33,8 @@ def get_available_slots(
 
     slots=filter_available_slots(
         date,
-        service.duration_minutes
+        service.duration_minutes,
+        db
     )
 
     return slots

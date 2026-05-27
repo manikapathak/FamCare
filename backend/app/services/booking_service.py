@@ -37,7 +37,7 @@ def process_checkout(
                 minutes=service.duration_minutes
             )
 
-            # Check patient conflict
+            # Check patient conflict with existing bookings
             patient_conflict = db.query(
                 Booking
             ).filter(
@@ -48,6 +48,12 @@ def process_checkout(
 
             if patient_conflict:
                 raise Exception(f"Patient already has a booking for {service.name} at {item.start_time}")
+
+            # Check patient conflict with other items in this checkout
+            for existing_assignment in assignments:
+                if (existing_assignment["start"] < end and
+                    existing_assignment["end"] > start):
+                    raise Exception(f"Patient cannot book {service.name} at {item.start_time} - conflicts with {existing_assignment['service_name']}")
 
             # Find available caregiver
             caregiver = find_available_caregiver(db, start, end)

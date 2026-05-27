@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
 from app.utils.slot_generator import generate_slots
+from app.services.conflict_service import find_available_caregiver
 
 
 def filter_available_slots(
     date,
-    service_duration
+    service_duration,
+    db: Session
 ):
 
     available = []
@@ -62,9 +65,17 @@ def filter_available_slots(
                 continue
 
 
-        available.append(
-            slot
-        )
+        # --------------------------
+        # CHECK CAREGIVER AVAILABILITY:
+        # Only show slot if at least one caregiver is free
+        # --------------------------
+
+        slot_end = slot_start + timedelta(minutes=service_duration)
+
+        available_caregiver = find_available_caregiver(db, slot_start, slot_end)
+
+        if available_caregiver:
+            available.append(slot)
 
 
     return available
